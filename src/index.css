@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+	font-size: 16px;
+	overflow: hidden;
+	scrollbar-width: none;
+	scroll-behavior: smooth;
+	-ms-overflow-style: none;
+	transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+}
+
+body {
+	--transition__duration: 0.75s; --transition__easing: ease-in-out;
+}
+
+::-webkit-scrollbar {
+	display: none
+}
