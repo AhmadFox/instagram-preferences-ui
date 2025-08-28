@@ -236,7 +236,7 @@ export function BottomSheet({
 
 						{/* Content */}
 						<div
-							className="flex-1 overflow-y-auto overscroll-contain pb-[80px] cursor-grab active:cursor-grabbing"
+							className="flex-1 overflow-y-auto overscroll-contain pb-[80px] "
 							style={{
 								maxHeight: `calc(100vh - ${title || showCloseButton ? '80px' : '20px'})`,
 								WebkitOverflowScrolling: 'touch'
