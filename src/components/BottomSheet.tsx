@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, useAnimation } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -38,6 +38,9 @@ export function BottomSheet({
 	footer
 }: BottomSheetProps) {
 	const [currentSnap, setCurrentSnap] = useState<SnapPoint>(initialSnap);
+	const [isContentScrollable, setIsContentScrollable] = useState(false);
+	const [isAtTop, setIsAtTop] = useState(true);
+	const contentRef = useRef<HTMLDivElement>(null);
 	const y = useMotionValue(0);
 	const controls = useAnimation();
 
@@ -108,6 +111,34 @@ export function BottomSheet({
 			await animateToSnap(targetSnap);
 		}
 	}, [currentSnap, y, getSnapPointValue, onClose, animateToSnap]);
+
+	// Check if content is scrollable and at top
+	useEffect(() => {
+		const checkScroll = () => {
+			if (contentRef.current) {
+				const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
+				setIsContentScrollable(scrollHeight > clientHeight);
+				setIsAtTop(scrollTop === 0);
+			}
+		};
+
+		checkScroll();
+		
+		// Add event listener for scroll events
+		if (contentRef.current) {
+			contentRef.current.addEventListener('scroll', checkScroll);
+		}
+		
+		// Add resize listener to check when window size changes
+		window.addEventListener('resize', checkScroll);
+		
+		return () => {
+			if (contentRef.current) {
+				contentRef.current.removeEventListener('scroll', checkScroll);
+			}
+			window.removeEventListener('resize', checkScroll);
+		};
+	}, [isOpen, children]);
 
 	// Initialize position when opening
 	useEffect(() => {
@@ -203,6 +234,9 @@ export function BottomSheet({
 						dragElastic={{ top: 0.05, bottom: 0.2 }}
 						onDragEnd={(_, info) => handleDragEnd(info)}
 						dragMomentum={false}
+						dragPropagation={false}
+						// Only allow dragging down if content is at top or we're not in full mode
+						dragListener={currentSnap !== 'full' || isAtTop}
 					>
 						{/* Header */}
 						<div>
@@ -236,10 +270,14 @@ export function BottomSheet({
 
 						{/* Content */}
 						<div
-							className="flex-1 overflow-y-auto overscroll-contain pb-[80px] "
+							ref={contentRef}
+							className="flex-1 overflow-y-auto overscroll-contain pb-[80px]"
 							style={{
 								maxHeight: `calc(100vh - ${title || showCloseButton ? '80px' : '20px'})`,
-								WebkitOverflowScrolling: 'touch'
+								WebkitOverflowScrolling: 'touch',
+								// Disable scroll when not in full mode or when dragging down
+								overflowY: (currentSnap === 'full' && isContentScrollable) ? 'auto' : 'hidden',
+								touchAction: (currentSnap === 'full' && isContentScrollable) ? 'pan-y' : 'none'
 							}}
 						>
 							{children}
@@ -256,7 +294,6 @@ export function BottomSheet({
 						</motion.div>
 					)}
 				</div>
-
 			)}
 		</AnimatePresence>
 	);
