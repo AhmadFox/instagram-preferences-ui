@@ -1,4 +1,4 @@
-import { BottomSheet } from './BottomSheet';
+import { BottomSheet, SnapPoint } from './BottomSheet';
 import { Heart } from 'lucide-react';
 import CommentForm from './CommentForm';
 
@@ -118,6 +118,13 @@ const MOCK_COMMENTS = [
   }
 ];
 
+const SNAP_POINTS: Record<SnapPoint, number> = {
+  dismissed: 1,
+  collapsed: 0.7,
+  half: 0.5,
+  full: 0,
+};
+
 export function CommentSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
 
   return (
@@ -127,6 +134,7 @@ export function CommentSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
       title="Comments"
       initialSnap="collapsed"
       showCloseButton={true}
+      snapPoints={SNAP_POINTS}
       className=""
       headerBorder= {true}
       footer={

@@ -11,9 +11,10 @@ interface BottomSheetProps {
 	className?: string;
 	headerBorder?: boolean;
 	footer?: React.ReactNode;
+	snapPoints: Record<SnapPoint, number>;
 }
 
-type SnapPoint = 'collapsed' | 'half' | 'full' | 'dismissed';
+export type SnapPoint = 'collapsed' | 'half' | 'full' | 'dismissed';
 
 const SNAP_POINTS = {
 	dismissed: 1,
@@ -34,7 +35,8 @@ export function BottomSheet({
 	showCloseButton = true,
 	headerBorder = false,
 	className = '',
-	footer
+	footer,
+	snapPoints
 }: BottomSheetProps) {
 
 
@@ -52,28 +54,34 @@ export function BottomSheet({
 
 	const backgroundOpacity = useTransform(y, [0, 1000], [0.8, 0]);
 
-	const getSnapPointValue = useCallback((snapPoint: SnapPoint) => {
-		if (typeof window === 'undefined') return 0;
-		const windowHeight = window.innerHeight;
-		return windowHeight * SNAP_POINTS[snapPoint];
-	}, []);
+	const getSnapPointValue = useCallback(
+		(snapPoint: SnapPoint) => {
+		  if (typeof window === 'undefined') return 0;
+		  const windowHeight = window.innerHeight;
+		  return windowHeight * snapPoints[snapPoint];
+		},
+		[snapPoints]
+	  );
 
-	const animateToSnap = useCallback(async (snapPoint: SnapPoint) => {
-		const targetY = getSnapPointValue(snapPoint);
-
-		await controls.start({
+	  const animateToSnap = useCallback(
+		async (snapPoint: SnapPoint) => {
+		  const targetY = getSnapPointValue(snapPoint);
+	
+		  await controls.start({
 			y: targetY,
 			transition: {
-				type: 'spring',
-				damping: 25,
-				stiffness: 300,
-				mass: 0.8,
-				velocity: y.getVelocity()
-			}
-		});
-
-		y.set(targetY);
-	}, [controls, y, getSnapPointValue]);
+			  type: 'spring',
+			  damping: 25,
+			  stiffness: 300,
+			  mass: 0.8,
+			  velocity: y.getVelocity(),
+			},
+		  });
+	
+		  y.set(targetY);
+		},
+		[controls, y, getSnapPointValue]
+	  );
 
 	const handleDragEnd = useCallback(async (info: PanInfo) => {
 		const velocity = info.velocity.y;

@@ -1,4 +1,4 @@
-import { BottomSheet } from './BottomSheet';
+import { BottomSheet, SnapPoint } from './BottomSheet';
 import MessageForm from './MessageForm';
 import SearchForm from './SearchForm';
 
@@ -110,12 +110,20 @@ const MOCK_SHARES = [
   },
 ];
 
+const SNAP_POINTS: Record<SnapPoint, number> = {
+  dismissed: 1,
+  collapsed: 0.6,
+  half: 0.5,
+  full: 0.2,
+};
+
 export function ShareSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
   return (
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
       initialSnap="collapsed"
+      snapPoints={SNAP_POINTS}
       showCloseButton={false}
       footer={<MessageForm />}
     >
@@ -126,7 +134,7 @@ export function ShareSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
         {MOCK_SHARES.map((share) => (
           <div
             key={share.id}
-            className="flex flex-col justify-center items-center space-y-2 pb-9"
+            className="flex flex-col justify-center items-center space-y-2"
           >
             {/* Avatar */}
             <img
