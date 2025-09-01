@@ -6,6 +6,7 @@ import { Instagram, Menu } from 'lucide-react';
 import { SwipeableDrawer } from './components/SwipeableDrawer';
 import { useSwipeableDrawer } from './hooks/useSwipeableDrawer';
 import { DrawerMenu } from './components/DrawerMenu';
+import { InstallPrompt } from './components/InstallPrompt';
 
 function App() {
 	const {
@@ -64,6 +65,9 @@ function App() {
 			{/* Bottom Sheet */}
 			<CommentSheet isOpen={isCommentOpen} onClose={close} />
 			<ShareSheet isOpen={isShareOpen} onClose={close} />
+
+			{/* PWA Install Prompt */}
+			<InstallPrompt />
 		</div>
 	);
 }
