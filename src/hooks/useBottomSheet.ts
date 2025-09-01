@@ -1,47 +1,37 @@
 import { useState, useCallback } from 'react';
 
-interface UseBottomSheetProps {
-  defaultOpen?: boolean;
-  onOpen?: () => void;
-  onClose?: () => void;
-}
+type SheetType = 'comment' | 'share' | null;
 
 interface UseBottomSheetReturn {
-  isOpen: boolean;
-  open: () => void;
+  activeSheet: SheetType;
+  openComment: () => void;
+  openShare: () => void;
   close: () => void;
-  toggle: () => void;
+  isCommentOpen: boolean;
+  isShareOpen: boolean;
 }
 
-export function useBottomSheet({ 
-  defaultOpen = false, 
-  onOpen, 
-  onClose 
-}: UseBottomSheetProps = {}): UseBottomSheetReturn {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+export function useBottomSheet(): UseBottomSheetReturn {
+  const [activeSheet, setActiveSheet] = useState<SheetType>(null);
 
-  const open = useCallback(() => {
-    setIsOpen(true);
-    onOpen?.();
-  }, [onOpen]);
+  const openComment = useCallback(() => {
+    setActiveSheet('comment');
+  }, []);
+
+  const openShare = useCallback(() => {
+    setActiveSheet('share');
+  }, []);
 
   const close = useCallback(() => {
-    setIsOpen(false);
-    onClose?.();
-  }, [onClose]);
-
-  const toggle = useCallback(() => {
-    if (isOpen) {
-      close();
-    } else {
-      open();
-    }
-  }, [isOpen, open, close]);
+    setActiveSheet(null);
+  }, []);
 
   return {
-    isOpen,
-    open,
+    activeSheet,
+    openComment,
+    openShare,
     close,
-    toggle
+    isCommentOpen: activeSheet === 'comment',
+    isShareOpen: activeSheet === 'share',
   };
 }

@@ -9,6 +9,7 @@ interface BottomSheetProps {
 	initialSnap?: 'collapsed' | 'half' | 'full';
 	showCloseButton?: boolean;
 	className?: string;
+	headerBorder?: boolean;
 	footer?: React.ReactNode;
 }
 
@@ -16,14 +17,13 @@ type SnapPoint = 'collapsed' | 'half' | 'full' | 'dismissed';
 
 const SNAP_POINTS = {
 	dismissed: 1,
-	collapsed: 0.85, // 85% from top
+	collapsed: 0.75, // 85% from top
 	half: 0.5,       // 50% from top  
-	full: 0.1        // 10% from top (almost full screen)
+	full: 0        // 10% from top (almost full screen)
 };
 
 const VELOCITY_THRESHOLD = 800;
 const DRAG_THRESHOLD = 50;
-const HEADER_HEIGHT = 73;
 
 export function BottomSheet({
 	isOpen,
@@ -32,6 +32,7 @@ export function BottomSheet({
 	title,
 	initialSnap = 'half',
 	showCloseButton = true,
+	headerBorder = false,
 	className = '',
 	footer
 }: BottomSheetProps) {
@@ -124,19 +125,14 @@ export function BottomSheet({
 		  setFooterHeight(footerRef.current?.getBoundingClientRect().height || 0);
 		};
 	  
-		updateFooterHeight(); // أول مرة لما يفتح
+		updateFooterHeight();
 		window.addEventListener('resize', updateFooterHeight);
 	  
 		return () => {
 		  window.removeEventListener('resize', updateFooterHeight);
 		};
-	  }, [isOpen]); // ✅ يعتمد على فتح/إغلاق الشيت
+	  }, [isOpen]);
 	  
-	  useEffect(() => {
-		if (isOpen) {
-		  console.log("footerRef Height ==>", footerHeight);
-		}
-	  }, [footerHeight, isOpen]);
 
 	  useEffect(() => {
 		if (!isOpen) return;
@@ -145,22 +141,13 @@ export function BottomSheet({
 		  setHeaderHeight(headerRef.current?.getBoundingClientRect().height || 0);
 		};
 	  
-		updateHeaderHeight(); // أول مرة لما يفتح
+		updateHeaderHeight();
 		window.addEventListener('resize', updateHeaderHeight);
 	  
 		return () => {
 		  window.removeEventListener('resize', updateHeaderHeight);
 		};
 	  }, [isOpen]);
-	  
-	  useEffect(() => {
-		if (isOpen) {
-		  console.log("headerRef Height ==>", headerHeight);
-		}
-	  }, [headerHeight, isOpen]);
-	  
-	  
-	  
 	  
 
 	// Check if content is scrollable and at top
@@ -241,15 +228,12 @@ export function BottomSheet({
 	const footerY = useTransform(
 		y,
 		[
-		  window.innerHeight - ((headerHeight + 19) + footerHeight), // بداية التماس
-		  window.innerHeight - (headerHeight + 19)          // header فقط
+		  window.innerHeight - ((headerHeight + 19) + footerHeight),
+		  window.innerHeight - (headerHeight + 19)
 		],
-		[0, footerHeight], // من 0 → ينزلق لأسفل بارتفاعه
+		[0, footerHeight],
 		{ clamp: true }
 	  );
-
-	  console.log('window.innerHeight ', window.innerHeight );
-			
 
 	return (
 		<AnimatePresence>
@@ -293,7 +277,7 @@ export function BottomSheet({
 						dragListener={currentSnap !== 'full' || isAtTop}
 					>
 						{/* Header */}
-						<div ref={headerRef} className='border-b border-gray-100'>
+						<div ref={headerRef} className={`${headerBorder ? 'border-b' : ''} border-gray-100`}>
 							{/* Grab Handle */}
 							<div className="flex justify-center py-2">
 								<div className="w-9 h-[3px] bg-gray-500 rounded-full" />
@@ -327,8 +311,9 @@ export function BottomSheet({
 						{/* Content */}
 						<div
 							ref={contentRef}
-							className="flex-1 overflow-y-auto overscroll-contain pb-[80px]"
+							className="flex-1 overflow-y-auto overscroll-contain"
 							style={{
+								paddingBottom: `${footerHeight + 8}px`,
 								maxHeight: `calc(100vh - ${title || showCloseButton ? '80px' : '20px'})`,
 								WebkitOverflowScrolling: 'touch',
 								// Enable scrolling only when in full mode and content is scrollable

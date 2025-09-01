@@ -1,10 +1,17 @@
-import { InstagramPost } from './components/InstagramPost';
-import { InstagramCommentSheet } from './components/InstagramCommentSheet';
+import { Post } from './components/Post';
+import { CommentSheet } from './components/CommentSheet';
 import { useBottomSheet } from './hooks/useBottomSheet';
+import { ShareSheet } from './components/ShareSheet';
 import { Instagram } from 'lucide-react';
 
 function App() {
-  const { isOpen, open, close } = useBottomSheet();
+  const { 
+    isCommentOpen, 
+    isShareOpen, 
+    openComment, 
+    openShare, 
+    close 
+  } = useBottomSheet();
 
   return (
     <div className=" bg-gray-50">
@@ -28,13 +35,14 @@ function App() {
 
         {/* Instagram Post */}
         <div className="p-4">
-          <InstagramPost onCommentClick={open} />
+          <Post onCommentClick={openComment} onShareClick={openShare} />
         </div>
 
       </main>
 
       {/* Bottom Sheet */}
-      <InstagramCommentSheet isOpen={isOpen} onClose={close} />
+      <CommentSheet isOpen={isCommentOpen} onClose={close} />
+      <ShareSheet isOpen={isShareOpen} onClose={close} />
     </div>
   );
 }

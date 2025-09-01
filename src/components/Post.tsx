@@ -3,9 +3,10 @@ import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from 'lucide-rea
 
 interface InstagramPostProps {
   onCommentClick: () => void;
+  onShareClick: () => void;
 }
 
-export function InstagramPost({ onCommentClick }: InstagramPostProps) {
+export function Post({ onCommentClick, onShareClick }: InstagramPostProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       {/* Post Header */}
@@ -48,7 +49,10 @@ export function InstagramPost({ onCommentClick }: InstagramPostProps) {
             >
               <MessageCircle className="w-6 h-6 text-gray-700" />
             </button>
-            <button className="hover:scale-110 transition-transform">
+            <button
+              onClick={onShareClick}  
+              className="hover:scale-110 transition-transform"
+            >
               <Send className="w-6 h-6 text-gray-700" />
             </button>
           </div>

@@ -118,22 +118,23 @@ const MOCK_COMMENTS = [
   }
 ];
 
-export function InstagramCommentSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
+export function CommentSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
 
   return (
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
       title="Comments"
-      initialSnap="half"
+      initialSnap="collapsed"
       showCloseButton={true}
       className=""
+      headerBorder= {true}
       footer={
         <CommentForm />
       }
     >
       {/* Comments List */}
-      <div className="px-4 pt-4 space-y-4 pb-20">
+      <div className="px-4 pt-4 space-y-4">
         {MOCK_COMMENTS.map((comment) => (
           <div key={comment.id} className="flex space-x-3">
             {/* Avatar */}
@@ -175,9 +176,9 @@ export function InstagramCommentSheet({ isOpen, onClose }: InstagramCommentSheet
         ))}
         
         {/* Load more comments */}
-        {/* <button className="w-full py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <button className="w-full py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           View more comments
-        </button> */}
+        </button>
       </div>
     </BottomSheet>
   );
