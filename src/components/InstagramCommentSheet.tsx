@@ -1,6 +1,5 @@
-import React from 'react';
 import { BottomSheet } from './BottomSheet';
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Smile } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import CommentForm from './CommentForm';
 
 interface InstagramCommentSheetProps {
@@ -64,33 +63,6 @@ const MOCK_COMMENTS = [
     isLiked: false
   },
   {
-    id: 4,
-    username: 'photography_pro',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
-    comment: 'The composition and colors are incredible. What camera settings did you use?',
-    likes: 31,
-    timeAgo: '8h',
-    isLiked: true
-  },
-  {
-    id: 5,
-    username: 'nature_lover_2024',
-    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
-    comment: 'Nature at its finest! 🌿 This makes me want to go hiking',
-    likes: 15,
-    timeAgo: '12h',
-    isLiked: false
-  },
-  {
-    id: 6,
-    username: 'wanderlust_soul',
-    avatar: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
-    comment: 'Stunning view! Is this accessible by car or do you need to hike?',
-    likes: 7,
-    timeAgo: '1d',
-    isLiked: false
-  },
-  {
     id: 7,
     username: 'photography_pro',
     avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
@@ -116,14 +88,37 @@ const MOCK_COMMENTS = [
     likes: 7,
     timeAgo: '1d',
     isLiked: false
+  },
+  {
+    id: 10,
+    username: 'photography_pro',
+    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
+    comment: 'The composition and colors are incredible. What camera settings did you use?',
+    likes: 31,
+    timeAgo: '8h',
+    isLiked: true
+  },
+  {
+    id: 11,
+    username: 'nature_lover_2024',
+    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
+    comment: 'Nature at its finest! 🌿 This makes me want to go hiking',
+    likes: 15,
+    timeAgo: '12h',
+    isLiked: false
+  },
+  {
+    id: 12,
+    username: 'wanderlust_soul',
+    avatar: 'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=50&h=50&fit=crop',
+    comment: 'Stunning view! Is this accessible by car or do you need to hike?',
+    likes: 7,
+    timeAgo: '1d',
+    isLiked: false
   }
 ];
 
 export function InstagramCommentSheet({ isOpen, onClose }: InstagramCommentSheetProps) {
-  function setOpen(): void {
-    console.log('');
-    
-  }
 
   return (
     <BottomSheet
@@ -138,7 +133,7 @@ export function InstagramCommentSheet({ isOpen, onClose }: InstagramCommentSheet
       }
     >
       {/* Comments List */}
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 pt-4 space-y-4 pb-20">
         {MOCK_COMMENTS.map((comment) => (
           <div key={comment.id} className="flex space-x-3">
             {/* Avatar */}
@@ -180,9 +175,9 @@ export function InstagramCommentSheet({ isOpen, onClose }: InstagramCommentSheet
         ))}
         
         {/* Load more comments */}
-        <button className="w-full py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        {/* <button className="w-full py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           View more comments
-        </button>
+        </button> */}
       </div>
     </BottomSheet>
   );

@@ -25,6 +25,7 @@ const CommentForm = () => {
 					Post
 				</button>
 			</div>
+			{/* <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus unde velit ut veniam fugiat libero quidem alias. Itaque sapiente temporibus magnam excepturi quasi illum sunt ab ratione omnis. Rerum, porro!</p> */}
 		</div>
 	)
 }

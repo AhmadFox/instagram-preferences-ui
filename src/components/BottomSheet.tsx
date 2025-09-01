@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, useAnimation } from 'framer-motion';
-import { X } from 'lucide-react';
 
 interface BottomSheetProps {
 	isOpen: boolean;
@@ -25,7 +24,6 @@ const SNAP_POINTS = {
 const VELOCITY_THRESHOLD = 800;
 const DRAG_THRESHOLD = 50;
 const HEADER_HEIGHT = 73;
-const FOOTER_HEIGHT = 73;
 
 export function BottomSheet({
 	isOpen,
@@ -37,10 +35,17 @@ export function BottomSheet({
 	className = '',
 	footer
 }: BottomSheetProps) {
+
+
 	const [currentSnap, setCurrentSnap] = useState<SnapPoint>(initialSnap);
 	const [isContentScrollable, setIsContentScrollable] = useState(false);
 	const [isAtTop, setIsAtTop] = useState(true);
 	const contentRef = useRef<HTMLDivElement>(null);
+	const footerRef = useRef<HTMLDivElement>(null);
+	const headerRef = useRef<HTMLDivElement>(null);
+	const [footerHeight, setFooterHeight] = useState(0);
+	const [headerHeight, setHeaderHeight] = useState(0);
+
 	const y = useMotionValue(0);
 	const controls = useAnimation();
 
@@ -112,6 +117,52 @@ export function BottomSheet({
 		}
 	}, [currentSnap, y, getSnapPointValue, onClose, animateToSnap]);
 
+	useEffect(() => {
+		if (!isOpen) return;
+	  
+		const updateFooterHeight = () => {
+		  setFooterHeight(footerRef.current?.getBoundingClientRect().height || 0);
+		};
+	  
+		updateFooterHeight(); // أول مرة لما يفتح
+		window.addEventListener('resize', updateFooterHeight);
+	  
+		return () => {
+		  window.removeEventListener('resize', updateFooterHeight);
+		};
+	  }, [isOpen]); // ✅ يعتمد على فتح/إغلاق الشيت
+	  
+	  useEffect(() => {
+		if (isOpen) {
+		  console.log("footerRef Height ==>", footerHeight);
+		}
+	  }, [footerHeight, isOpen]);
+
+	  useEffect(() => {
+		if (!isOpen) return;
+	  
+		const updateHeaderHeight = () => {
+		  setHeaderHeight(headerRef.current?.getBoundingClientRect().height || 0);
+		};
+	  
+		updateHeaderHeight(); // أول مرة لما يفتح
+		window.addEventListener('resize', updateHeaderHeight);
+	  
+		return () => {
+		  window.removeEventListener('resize', updateHeaderHeight);
+		};
+	  }, [isOpen]);
+	  
+	  useEffect(() => {
+		if (isOpen) {
+		  console.log("headerRef Height ==>", headerHeight);
+		}
+	  }, [headerHeight, isOpen]);
+	  
+	  
+	  
+	  
+
 	// Check if content is scrollable and at top
 	useEffect(() => {
 		const checkScroll = () => {
@@ -123,15 +174,15 @@ export function BottomSheet({
 		};
 
 		checkScroll();
-		
+
 		// Add event listener for scroll events
 		if (contentRef.current) {
 			contentRef.current.addEventListener('scroll', checkScroll);
 		}
-		
+
 		// Add resize listener to check when window size changes
 		window.addEventListener('resize', checkScroll);
-		
+
 		return () => {
 			if (contentRef.current) {
 				contentRef.current.removeEventListener('scroll', checkScroll);
@@ -190,12 +241,15 @@ export function BottomSheet({
 	const footerY = useTransform(
 		y,
 		[
-			window.innerHeight - HEADER_HEIGHT - FOOTER_HEIGHT,
-			window.innerHeight - HEADER_HEIGHT
+		  window.innerHeight - ((headerHeight + 19) + footerHeight), // بداية التماس
+		  window.innerHeight - (headerHeight + 19)          // header فقط
 		],
-		[0, FOOTER_HEIGHT],
+		[0, footerHeight], // من 0 → ينزلق لأسفل بارتفاعه
 		{ clamp: true }
-	);
+	  );
+
+	  console.log('window.innerHeight ', window.innerHeight );
+			
 
 	return (
 		<AnimatePresence>
@@ -214,7 +268,7 @@ export function BottomSheet({
 
 					{/* Bottom Sheet */}
 					<motion.div
-						className={`fixed left-0 right-0 bg-white ${className}`}
+						className={`fixed left-0 right-0 bg-white overflow-hidden ${className}`}
 						style={{
 							y,
 							top: 20,
@@ -239,15 +293,15 @@ export function BottomSheet({
 						dragListener={currentSnap !== 'full' || isAtTop}
 					>
 						{/* Header */}
-						<div>
+						<div ref={headerRef} className='border-b border-gray-100'>
 							{/* Grab Handle */}
-							<div className="flex justify-center pt-2 pb-1">
+							<div className="flex justify-center py-2">
 								<div className="w-9 h-[3px] bg-gray-500 rounded-full" />
 							</div>
 
 							{/* Header */}
 							{(title || showCloseButton) && (
-								<div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+								<div className="flex items-center justify-between px-4 py-3">
 									<div className="flex-1">
 										{title && (
 											<h2 className="font-semibold text-gray-900 text-center">
@@ -261,7 +315,9 @@ export function BottomSheet({
 											className="absolute right-4 top-5 p-2 hover:bg-gray-100 rounded-full transition-colors"
 											aria-label="Close"
 										>
-											<X className="w-5 h-5 text-gray-500" />
+											<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+												<path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+											</svg>
 										</button>
 									)}
 								</div>
@@ -275,9 +331,12 @@ export function BottomSheet({
 							style={{
 								maxHeight: `calc(100vh - ${title || showCloseButton ? '80px' : '20px'})`,
 								WebkitOverflowScrolling: 'touch',
-								// Disable scroll when not in full mode or when dragging down
+								// Enable scrolling only when in full mode and content is scrollable
 								overflowY: (currentSnap === 'full' && isContentScrollable) ? 'auto' : 'hidden',
-								touchAction: (currentSnap === 'full' && isContentScrollable) ? 'pan-y' : 'none'
+								// Allow pan-y touch action only when in full mode and content is scrollable
+								touchAction: (currentSnap === 'full' && isContentScrollable) ? 'pan-y' : 'none',
+								// Show grab cursor when at top to indicate draggability
+								cursor: (currentSnap === 'full' && isAtTop) ? 'grab' : 'auto'
 							}}
 						>
 							{children}
@@ -287,12 +346,14 @@ export function BottomSheet({
 					{/* Footer OUTSIDE motion.div */}
 					{footer && (
 						<motion.div
-							className="absolute bottom-0 left-0 right-0"
+							ref={footerRef}
+							className="fixed bottom-0 left-0 right-0"
 							style={{ y: footerY }}
 						>
 							{footer}
 						</motion.div>
 					)}
+					{/* Debug overlay */}
 				</div>
 			)}
 		</AnimatePresence>
